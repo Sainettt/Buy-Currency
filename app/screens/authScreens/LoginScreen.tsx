@@ -1,6 +1,6 @@
-import React, { useContext } from 'react';
-import { Keyboard, TouchableWithoutFeedback, View } from 'react-native';
-import LoginFields from '../../components/LogInFields';
+import React, { useContext, useState } from 'react';
+import { Keyboard, TouchableWithoutFeedback, View, ActivityIndicator } from 'react-native';
+import LoginFields from '../../components/LogInFields'; // <-- Нужно доработать этот компонент
 import AuthAskText from '../../components/AuthAskText';
 import { authStyles } from '../../styles/authStyles';
 import AuthSubmitButton from '../../components/AuthSubmitButton';
@@ -11,13 +11,34 @@ import { AuthContext } from '../../context/AuthContext';
 type Props = NativeStackScreenProps<AuthStackParamList, 'Login'>;
 
 const LoginScreen: React.FC<Props> = ({ navigation }: Props) => {
-  const {setIsLoggedIn} = useContext(AuthContext);
+  const { login, isLoading } = useContext(AuthContext);
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleLogin = () => {
+    login(email, password);
+  };
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={authStyles.container}>
-        <LoginFields />
-        <AuthSubmitButton buttonText="Sign In" onPress={() => {setIsLoggedIn(true)}}/>
+        {/* ВАЖНО: Тебе нужно изменить LoginFields, чтобы он принимал эти пропсы */}
+        <LoginFields 
+            username={username} 
+            setUsername={setUsername}
+            email={email} 
+            setEmail={setEmail} 
+            password={password} 
+            setPassword={setPassword} 
+        />
+        
+        {isLoading ? (
+            <ActivityIndicator size="large" color="#0000ff" />
+        ) : (
+            <AuthSubmitButton buttonText="Sign In" onPress={handleLogin} />
+        )}
+        
         <AuthAskText
           mainText="Don`t have an account yet? "
           buttonText="Sign Up"

@@ -3,9 +3,9 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import prisma from '../prisma';
 
-const generateJwt = (id: number, email: string) => {
+const generateJwt = (id: number, email: string, userName: string) => {
     return jwt.sign(
-        { id, email },
+        { id, email, userName },
         process.env.JWT_SECRET || 'secret',
         { expiresIn: '24h' }
     );
@@ -15,10 +15,11 @@ class AuthController {
 
     async registration(req: Request, res: Response): Promise<any> {
         try {
-            const { email, password } = req.body;
+            
+            const { userName, email, password } = req.body;
 
-            if (!email || !password) {
-                return res.status(400).json({ message: 'Email and password are required' });
+            if (!email || !password || !userName) {
+                return res.status(400).json({ message: 'Email, password and userName are required' });
             }
 
             const candidate = await prisma.user.findUnique({ where: { email } });
@@ -30,12 +31,13 @@ class AuthController {
 
             const user = await prisma.user.create({
                 data: {
+                    username: userName, 
                     email,
                     password: hashPassword
                 }
             });
 
-            const token = generateJwt(user.id, user.email);
+            const token = generateJwt(user.id, user.email, user.username);
 
             return res.json({ token });
         } catch (e) {
@@ -58,7 +60,7 @@ class AuthController {
                 return res.status(400).json({ message: 'Incorrect password' });
             }
             
-            const token = generateJwt(user.id, user.email);
+            const token = generateJwt(user.id, user.email, user.username);
 
             return res.json({ token });
         } catch (e) {
