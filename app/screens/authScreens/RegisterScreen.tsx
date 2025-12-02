@@ -1,13 +1,13 @@
 import React, { useContext, useState } from 'react';
 import { Keyboard, TouchableWithoutFeedback, View, ActivityIndicator, Alert } from 'react-native';
 import AuthAskText from '../../components/AuthAskText';
-import RegisterFields from '../../components/RegisterFields'; // <-- Нужно доработать этот компонент
+import RegisterFields from '../../components/RegisterFields';
 import AuthSubmitButton from '../../components/AuthSubmitButton';
 import { authStyles } from '../../styles/authStyles';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AuthStackParamList } from '../../src/navigation/authTypes';
 import { AuthContext } from '../../context/AuthContext';
-
+import { isValidEmail, isValidPassword } from '../../utils/validation/validation';
 type Props = NativeStackScreenProps<AuthStackParamList, 'Register'>;
 
 const RegisterScreen: React.FC<Props> = ({ navigation }: Props) => {
@@ -31,6 +31,15 @@ const RegisterScreen: React.FC<Props> = ({ navigation }: Props) => {
       Alert.alert('Error', 'Please enter an email');
       return;
     }
+    // if (!isValidEmail(email)) {
+    //   Alert.alert('Error', 'Please enter a valid email address');
+    //   return;
+    // }
+    // if (!isValidPassword(password)) {
+    //   Alert.alert('Error', 'Password must be at least 6 characters long, contain at least one uppercase letter and one special character');
+    //   return;
+    // }
+
      register(username, email, password);
   };
 
