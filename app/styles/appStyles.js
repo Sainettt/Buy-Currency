@@ -40,6 +40,16 @@ export const appStyles = StyleSheet.create({
     fontFamily: 'Poppins-Bold',
     color: '#EEEEEE',
   },
+  currencyNameAndPriceText: {
+    fontSize: 32,
+    fontFamily: 'Poppins-Regular',
+    color: '#FFFFFF',
+  },
+  currencyChangeText: {
+    fontSize: 20,
+    fontFamily: 'Poppins-Medium',
+    color: '#FFFFFF',
+  },
 
   topUpButton: {
     width: 115,
@@ -104,7 +114,7 @@ export const appStyles = StyleSheet.create({
   },
   trendHeaderContainer: {
     width: '100%',
-    height: 450,
+    height: 455,
     borderRadius: 10,
     backgroundColor: '#636363',
   },
@@ -118,14 +128,30 @@ export const appStyles = StyleSheet.create({
   paymentMethodContainer: {
     width: 290,
     height: 80,
-    backgroundColor: '#3C3C3C', // Чуть светлее фона экрана, чтобы выделить карточку
+    backgroundColor: '#3C3C3C', 
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#636363', // Тонкая обводка
+    borderColor: '#636363', 
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
+  },
+  currencyChangePositiveContainer: {
+    width: 75,
+    height: 35,
+    backgroundColor: '#83EDA6',
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  currencyChangeNegativeContainer: {
+    width: 75,
+    height: 35,
+    backgroundColor: '#EB5B5B',
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 
   title: {

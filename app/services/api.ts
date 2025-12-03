@@ -1,7 +1,7 @@
 
 import axios from 'axios';
 
-const API_URL = 'http://10.0.2.2:4000/api/auth'; 
+const API_URL = 'http://10.0.2.2:4000/api'; 
 
 const $api = axios.create({
     baseURL: API_URL,
@@ -9,12 +9,18 @@ const $api = axios.create({
 
 export const authAPI = {
     async registration(userName: string, email: string, password: string) {
-        const response = await $api.post('/registration', { userName, email, password });
+        const response = await $api.post('auth/registration', { userName, email, password });
         return response.data;
     },
 
     async login(email: string, password: string) {
-        const response = await $api.post('/login', { email, password });
+        const response = await $api.post('auth/login', { email, password });
+        return response.data;
+    }
+};
+export const currencyAPI = {
+    async getPopular() {
+        const response = await $api.get('/currency/popular');
         return response.data;
     }
 };
