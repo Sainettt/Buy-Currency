@@ -3,7 +3,7 @@ import { Text, View, TouchableOpacity, StyleSheet } from 'react-native';
 import { appStyles } from '../styles/appStyles';
 import { Currency } from '../src/types/types';
 
-export const renderCurrencyItem = ({ item }: { item: Currency }) => {
+const CurrencyItem = ({ item }: { item: Currency }) => {
   const isPositive = parseFloat(item.change) >= 0;
 
   return (
@@ -44,3 +44,4 @@ const localStyles = StyleSheet.create({
     marginLeft: 50,
   },
 });
+export default CurrencyItem;

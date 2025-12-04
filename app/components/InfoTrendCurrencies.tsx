@@ -1,7 +1,7 @@
 import React from 'react';
 import { FlatList, Text, View, StyleSheet } from 'react-native';
 import { appStyles } from '../styles/appStyles';
-import { renderCurrencyItem } from '../utils/renderCurrencyItem';
+import CurrencyItem from '../components/CurrencyItem';
 import { Currency } from '../src/types/types';
 
 type Props = {
@@ -26,7 +26,7 @@ const InfoTrendCurrencies: React.FC<Props> = ({ data }) => {
             <View style={appStyles.trendHeaderContainer}>
                 <FlatList
                     data={data}
-                    renderItem={renderCurrencyItem}
+                    renderItem={({ item }) => <CurrencyItem item={item} />}
                     keyExtractor={(item) => item.id}
                     showsVerticalScrollIndicator={false} 
                     ListEmptyComponent={
@@ -41,18 +41,8 @@ const InfoTrendCurrencies: React.FC<Props> = ({ data }) => {
 };
 
 const localStyles = StyleSheet.create({
-  itemRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 25,
-  },
   emptyListText: {
     textAlign: 'center', padding: 20, color: 'gray'
-  },
-  marginPriceVariable: {
-    marginLeft: 50,
   },
   marginPriceTextContainer:{
     marginLeft: 20,

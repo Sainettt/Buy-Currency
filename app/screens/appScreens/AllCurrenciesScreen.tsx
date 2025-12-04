@@ -5,7 +5,7 @@ import { appStyles } from '../../styles/appStyles'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { AppStackParamList } from '../../src/navigation/appTypes'
 import UpperTextScreen from '../../components/UpperTextScreen'
-
+import CurrencyItem from '../../components/CurrencyItem'
 type AllCurrenciesProps = NativeStackScreenProps<AppStackParamList, 'AllCurrencies'>;
 
 const AllCurrenciesScreen: React.FC<AllCurrenciesProps> = ({ navigation }   ) => {
@@ -13,9 +13,9 @@ const AllCurrenciesScreen: React.FC<AllCurrenciesProps> = ({ navigation }   ) =>
         <View style={appStyles.flexContainer}>
             <View style={appStyles.containerWithoutPadding}>
             <UpperTextScreen title="All Currencies" onPress={() => navigation.goBack()} />
-            <FlatList>
-
-            </FlatList>
+            <FlatList 
+                data={}
+            />
             </View>
             <BottomBar homePress={() => navigation.navigate('Main')} walletPress={() => {}} transactionPress={() => {}} />
         </View>
