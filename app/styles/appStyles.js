@@ -165,7 +165,7 @@ export const appStyles = StyleSheet.create({
     borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 260,
+    marginTop: 210,
     position: '',
   },
 

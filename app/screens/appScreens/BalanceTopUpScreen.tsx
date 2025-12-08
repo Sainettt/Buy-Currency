@@ -6,6 +6,8 @@ import {
   StyleSheet,
   ActivityIndicator,
   TouchableOpacity,
+  Modal,
+  Alert,
 } from 'react-native';
 import { appStyles } from '../../styles/appStyles';
 import BottomBar from '../../components/BottomBar';
@@ -24,6 +26,8 @@ const BalanceTopUpScreen: React.FC<BalanceTopUpScreenProps> = ({
   const [pln, setPln] = useState('0');
   const [usd, setUsd] = useState('0');
   const [rate, setRate] = useState<number | null>(null);
+  
+  const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
     const fetchRate = async () => {
@@ -77,6 +81,22 @@ const BalanceTopUpScreen: React.FC<BalanceTopUpScreenProps> = ({
     }
   };
 
+  const handleContinue = () => {
+    const amount = parseFloat(usd);
+    if (amount <= 0 || isNaN(amount)) {
+      Alert.alert('Error', 'Please enter a valid amount');
+      return;
+    }
+    setModalVisible(true);
+  };
+
+  const handleConfirmTopUp = () => {
+    setModalVisible(false);
+    // Here will be the logic to actually top up the balance
+    Alert.alert('Success', `Successfully added ${usd} USD to your balance!`);
+    navigation.navigate('Main');
+  };
+
   return (
     <View style={appStyles.flexContainer}>
       <View style={appStyles.container}>
@@ -85,10 +105,7 @@ const BalanceTopUpScreen: React.FC<BalanceTopUpScreenProps> = ({
           onPress={() => navigation.goBack()}
         />
 
-        {/* 1. Обертка для контента (инпуты + кнопка) */}
         <View style={localStyles.contentCenter}>
-          
-          {/* Блок с инпутами */}
           <View style={localStyles.inputsContainer}>
             <View style={localStyles.inputRow}>
               <TextInput
@@ -127,10 +144,14 @@ const BalanceTopUpScreen: React.FC<BalanceTopUpScreenProps> = ({
             </View>
           </View>
 
-          <TouchableOpacity style={appStyles.topUpContinueButton}>
-            <Text style={localStyles.continueText}> Continue </Text>
+          <TouchableOpacity 
+            style={appStyles.topUpContinueButton}
+            onPress={handleContinue}
+          >
+            <Text style={localStyles.continueButtonText}> 
+                Continue 
+            </Text>
           </TouchableOpacity>
-          
         </View>
       </View>
       
@@ -141,6 +162,43 @@ const BalanceTopUpScreen: React.FC<BalanceTopUpScreenProps> = ({
         walletPress={() => {}}
         transactionPress={() => {}}
       />
+
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={localStyles.modalOverlay}>
+          <View style={localStyles.modalContainer}>
+            <Text style={localStyles.modalTitle}>Confirm Top Up</Text>
+            
+            <Text style={localStyles.modalText}>
+              Are you sure you want to add funds to your balance?
+            </Text>
+
+            <Text style={localStyles.modalAmount}>{usd} USD</Text>
+
+            <View style={localStyles.modalButtonsRow}>
+
+              <TouchableOpacity 
+                style={[localStyles.modalButton, localStyles.modalButtonCancel]}
+                onPress={() => setModalVisible(false)}
+              >
+                <Text style={localStyles.modalButtonTextCancel}>Cancel</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity 
+                style={[localStyles.modalButton, localStyles.modalButtonConfirm]}
+                onPress={handleConfirmTopUp}
+              >
+                <Text style={localStyles.modalButtonTextConfirm}>Confirm</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
     </View>
   );
 };
@@ -149,15 +207,14 @@ const localStyles = StyleSheet.create({
   contentCenter: {
     flex: 1, 
     justifyContent: 'center', 
-    alignItems: 'center',
+    alignItems: 'center', 
   },
-  inputsContainer: {
-    marginTop: 150
-  },
+  inputsContainer: {marginTop: 150},
   inputRow: {
     flexDirection: 'row',
     justifyContent: 'center',
-    alignItems: 'center', 
+    alignItems: 'center',
+    marginBottom: 10,
   },
   inputTextMain: {
     fontSize: 64,
@@ -201,11 +258,81 @@ const localStyles = StyleSheet.create({
   marginIndicator: {
     marginRight: 10,
   },
-  continueText: {
-    fontSize: 20,
+  continueButtonText: {
+    fontFamily: 'Poppins-Bold', fontSize: 18, color: '#333'
+  },
+
+  // --- Styles for Modal ---
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContainer: {
+    width: '85%',
+    backgroundColor: '#3C3C3C',
+    borderRadius: 20,
+    padding: 25,
+    alignItems: 'center',
+
+    shadowColor: '#1111',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    borderWidth: 1,
+    borderColor: '#454545',
+  },
+  modalTitle: {
+    fontSize: 22,
     fontFamily: 'Poppins-Bold',
     color: '#FFFFFF',
-  }
+    marginBottom: 10,
+  },
+  modalText: {
+    fontSize: 16,
+    fontFamily: 'Poppins-Regular',
+    color: '#E5E5E5',
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  modalAmount: {
+    fontSize: 32,
+    fontFamily: 'Poppins-Bold',
+    color: '#83EDA6',
+    marginBottom: 25,
+  },
+  modalButtonsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  modalButton: {
+    borderRadius: 12,
+    paddingVertical: 12,
+    width: '47%',
+    alignItems: 'center',
+  },
+  modalButtonCancel: {
+    backgroundColor: '#636363',
+  },
+  modalButtonConfirm: {
+    backgroundColor: '#83EDA6',
+  },
+  modalButtonTextCancel: {
+    color: '#FFFFFF',
+    fontFamily: 'Poppins-Bold',
+    fontSize: 16,
+  },
+  modalButtonTextConfirm: {
+    color: '#333333',
+    fontFamily: 'Poppins-Bold',
+    fontSize: 16,
+  },
 });
 
 export default BalanceTopUpScreen;
