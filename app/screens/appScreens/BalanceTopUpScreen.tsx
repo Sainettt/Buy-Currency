@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useContext, useCallback } from 'react';
 import {
   Text,
   TextInput,
@@ -9,11 +9,14 @@ import {
   Modal,
   Alert,
 } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import { appStyles } from '../../styles/appStyles';
 import BottomBar from '../../components/BottomBar';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AppStackParamList } from '../../src/navigation/appTypes';
 import UpperTextScreen from '../../components/UpperTextScreen';
+import { AuthContext } from '../../context/AuthContext';
+import { walletAPI } from '../../services/api';
 
 type BalanceTopUpScreenProps = NativeStackScreenProps<
   AppStackParamList,
@@ -23,14 +26,17 @@ type BalanceTopUpScreenProps = NativeStackScreenProps<
 const BalanceTopUpScreen: React.FC<BalanceTopUpScreenProps> = ({
   navigation,
 }) => {
+  const { userId } = useContext(AuthContext);
   const [pln, setPln] = useState('0');
   const [usd, setUsd] = useState('0');
   const [rate, setRate] = useState<number | null>(null);
   
   const [modalVisible, setModalVisible] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
 
-  useEffect(() => {
-    const fetchRate = async () => {
+  useFocusEffect(
+    useCallback(() => {
+      const fetchRate = async () => {
       try {
         const response = await fetch(
           'https://api.binance.com/api/v3/ticker/price?symbol=USDTPLN',
@@ -45,7 +51,8 @@ const BalanceTopUpScreen: React.FC<BalanceTopUpScreenProps> = ({
       }
     };
     fetchRate();
-  }, []);
+    }, [])
+  );
 
   const handlePlnChange = (text: string) => {
     let formattedText = text.replace(',', '.');
@@ -90,11 +97,30 @@ const BalanceTopUpScreen: React.FC<BalanceTopUpScreenProps> = ({
     setModalVisible(true);
   };
 
-  const handleConfirmTopUp = () => {
-    setModalVisible(false);
-    // Here will be the logic to actually top up the balance
-    Alert.alert('Success', `Successfully added ${usd} USD to your balance!`);
-    navigation.navigate('Main');
+  const handleConfirmTopUp = async () => {
+
+    if (!userId) {
+        Alert.alert("Error", "User not found");
+        return;
+    }
+    try {
+        setIsProcessing(true);
+
+        const amountUSD = parseFloat(usd);
+            
+        await walletAPI.topUp(userId, amountUSD);
+        setModalVisible(false);
+
+        Alert.alert('Success', `Successfully added ${usd} USD to your balance!`);
+        navigation.navigate('Main');
+    }
+    catch (error: any) {
+      setModalVisible(false);
+        Alert.alert('Top Up Failed', error.response?.data?.message || 'Transaction failed');
+    }
+    finally {
+      setIsProcessing(false);
+    }
   };
 
   return (

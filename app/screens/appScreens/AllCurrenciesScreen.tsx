@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { View, FlatList, Text } from 'react-native';
+import React, { useState, useCallback, useRef } from 'react';
+import { View, FlatList, Text, ActivityIndicator } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import BottomBar from '../../components/BottomBar';
 import { appStyles } from '../../styles/appStyles';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -15,19 +16,38 @@ type AllCurrenciesProps = NativeStackScreenProps<
 
 const AllCurrenciesScreen: React.FC<AllCurrenciesProps> = ({ navigation }) => {
   const [allCurrencies, setAllCurrencies] = useState<Currency[]>([]);
+  const [loading, setLoading] = useState(false);
+  const isLoaded = useRef(false)
 
-  useEffect(() => {
-    fetchAllCurrencies();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
 
-  const fetchAllCurrencies = async () => {
-    try {
-      const data = await currencyAPI.getTopCryptos(100);
-      setAllCurrencies(data);
-    } catch (e) {
-      console.log(e);
-    }
-  };
+      let isActive = true;
+      const fetchAllCurrencies = async () => {
+
+        if (!isLoaded.current) {
+            setLoading(true);
+        }
+        try {
+          const data = await currencyAPI.getTopCryptos(100);
+          setAllCurrencies(data);
+          isLoaded.current = true;
+        } catch (e) {
+          console.log(e);
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchAllCurrencies();
+
+      const intervalId = setInterval(fetchAllCurrencies, 10000);
+
+      return () => {
+        isActive = false;
+        clearInterval(intervalId);
+      };
+    }, []) 
+  );
 
   return (
     <View style={appStyles.flexContainer}>
@@ -36,15 +56,27 @@ const AllCurrenciesScreen: React.FC<AllCurrenciesProps> = ({ navigation }) => {
           title="All Currencies"
           onPress={() => navigation.goBack()}
         />
-        <FlatList
-          data={allCurrencies}
-          renderItem={({ item }) => <CurrencyItem item={item} />}
-          keyExtractor={item => item.id}
-          showsVerticalScrollIndicator={false}
-          ListEmptyComponent={
-            <Text style={appStyles.emptyListText}>Loading data...</Text>
-          }
-        />
+        {loading && allCurrencies.length === 0 ? (
+          <View style={appStyles.indicatorStyle}>
+              <ActivityIndicator size="large" color="#83EDA6" />
+           </View>
+        ) :
+        (
+
+          <FlatList
+            data={allCurrencies}
+            renderItem={({ item }) => <CurrencyItem item={item} />}
+            keyExtractor={item => item.id}
+            showsVerticalScrollIndicator={false}
+            initialNumToRender={20} 
+            maxToRenderPerBatch={10}
+            windowSize={5}
+            ListEmptyComponent={
+              <Text style={appStyles.emptyListText}>Loading data...</Text>
+            }
+          />
+        )
+        }
       </View>
       <BottomBar
         homePress={() => navigation.navigate('Main')}

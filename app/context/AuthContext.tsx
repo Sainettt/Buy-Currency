@@ -5,6 +5,7 @@ import { Alert } from 'react-native';
 type AuthContextType = {
   isLoggedIn: boolean;
   token: string | null;
+  userId: number | null;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (
@@ -18,6 +19,7 @@ type AuthContextType = {
 export const AuthContext = createContext<AuthContextType>({
   isLoggedIn: false,
   token: null,
+  userId: null,
   isLoading: false,
   login: async () => {},
   register: async () => {},
@@ -27,6 +29,7 @@ export const AuthContext = createContext<AuthContextType>({
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [token, setToken] = useState<string | null>(null);
+  const [userId, setUserId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const login = async (email: string, password: string) => {
@@ -35,6 +38,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const data = await authAPI.login(email, password);
 
       setToken(data.token);
+      setUserId(data.user.id);
       setIsLoggedIn(true);
     } catch (error: any) {
       console.log(error);
@@ -57,6 +61,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const data = await authAPI.registration(userName, email, password);
 
       setToken(data.token);
+      setUserId(data.user.id);
       setIsLoggedIn(true);
     } catch (error: any) {
       console.log(error);
@@ -71,12 +76,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = () => {
     setToken(null);
+    setUserId(null);
     setIsLoggedIn(false);
   };
 
   return (
     <AuthContext.Provider
-      value={{ isLoggedIn, token, isLoading, login, register, logout }}
+      value={{ isLoggedIn, token, userId, isLoading, login, register, logout }}
     >
       {children}
     </AuthContext.Provider>

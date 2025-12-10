@@ -78,7 +78,14 @@ class AuthController {
 
             const token = generateJwt(user.id, user.email, user.username, user.createdAt);
 
-            return res.json({ token });
+            return res.json({ 
+                token,
+                user: {
+                    id: user.id,
+                    email: user.email,
+                    username: user.username
+                }
+            });
         } catch (e) {
             console.error(e);
             return res.status(500).json({ message: 'Registration error' });
@@ -133,7 +140,14 @@ class AuthController {
             
             const token = generateJwt(user.id, user.email, user.username, user.createdAt);
 
-            return res.json({ token });
+            return res.json({ 
+                token,
+                user: {
+                    id: user.id,
+                    email: user.email,
+                    username: user.username
+                }
+            });
         } catch (e) {
             console.error(e);
             return res.status(500).json({ message: 'Login error' });

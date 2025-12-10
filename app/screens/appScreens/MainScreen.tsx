@@ -1,30 +1,59 @@
-import React, { useEffect, useState } from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+import React, { useState, useContext, useCallback, useRef} from 'react';
+import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import { appStyles } from '../../styles/appStyles';
 import InfoTrendCurrencies from '../../components/InfoTrendCurrencies';
 import BottomBar from '../../components/BottomBar';
 import { AppStackParamList } from '../../src/navigation/appTypes';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { currencyAPI } from '../../services/api';
+import { currencyAPI, walletAPI } from '../../services/api';
+import { AuthContext } from '../../context/AuthContext';
 
 type MainProps = NativeStackScreenProps<AppStackParamList, 'Main'>;
 
 const MainScreen: React.FC<MainProps> = ({ navigation }: MainProps) => {
-  const [totalBalance, setTotalBalance] = useState(500.23);
+  const {userId} = useContext(AuthContext);
+  const [totalBalance, setTotalBalance] = useState('0.00');
   const [currencies, setCurrencies] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    fetchCurrencies();
-  }, []);
+  const isLoaded = useRef(false);
 
-  const fetchCurrencies = async () => {
-    try {
-      const data = await currencyAPI.getTopCryptos(10);
-      setCurrencies(data);
-    } catch (e) {
-      console.log(e);
-    }
-  };
+  useFocusEffect(
+    useCallback(() => {
+      let isActive = true;
+
+      const fetchData = async () => {
+        if (!userId) return;
+        if (!isLoaded.current) setLoading(true);
+
+        try {
+          const [cryptoData, portfolioData] = await Promise.all([
+             currencyAPI.getTopCryptos(10),
+             walletAPI.getPortfolio(userId)
+          ]);
+          if (isActive){
+            setCurrencies(cryptoData);
+            setTotalBalance(portfolioData.totalBalanceUsd);
+            isLoaded.current = true;
+          }
+        } catch (e) {
+          console.log(e);
+        } finally {
+          if (isActive) setLoading(false);
+        }
+      };
+      fetchData();
+
+      const intervalId = setInterval(fetchData, 5000);
+
+      return () => {
+        isActive = false;
+        clearInterval(intervalId);
+      };
+
+    }, [userId])
+  );
 
   return (
     <View style={appStyles.flexContainer}>
@@ -36,7 +65,13 @@ const MainScreen: React.FC<MainProps> = ({ navigation }: MainProps) => {
           <Text style={appStyles.totalBalanceText}>Total balance</Text>
         </View>
         <View style={appStyles.balanceContainer}>
-          <Text style={appStyles.balanceText}>{totalBalance}$</Text>
+          {loading ? (
+            <View style={appStyles.indicatorStyle}>
+                <ActivityIndicator size="large" color="#83EDA6" />
+             </View>
+          ) : (
+            <Text style={appStyles.balanceText}>{totalBalance}$</Text>
+          )}
           <TouchableOpacity
             style={appStyles.topUpButton}
             onPress={() => {

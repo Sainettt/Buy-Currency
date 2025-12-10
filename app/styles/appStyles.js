@@ -181,5 +181,10 @@ export const appStyles = StyleSheet.create({
     position: 'absolute',
     left: 10,
     padding: 10, 
+  },
+  indicatorStyle: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center'
   }
 });

@@ -29,6 +29,8 @@ const InfoTrendCurrencies: React.FC<Props> = ({ data }) => {
                     renderItem={({ item }) => <CurrencyItem item={item} />}
                     keyExtractor={(item) => item.id}
                     showsVerticalScrollIndicator={false} 
+                    initialNumToRender={10}
+                    windowSize={5}
                     ListEmptyComponent={
                         <Text style={appStyles.emptyListText}>
                             Loading data...
