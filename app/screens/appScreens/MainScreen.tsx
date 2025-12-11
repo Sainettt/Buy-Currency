@@ -15,6 +15,7 @@ const MainScreen: React.FC<MainProps> = ({ navigation }: MainProps) => {
   const {userId} = useContext(AuthContext);
   const [totalBalance, setTotalBalance] = useState('0.00');
   const [currencies, setCurrencies] = useState([]);
+  const [portfolioAssets, setPortfolioAssets] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
   const isLoaded = useRef(false);
@@ -35,6 +36,7 @@ const MainScreen: React.FC<MainProps> = ({ navigation }: MainProps) => {
           if (isActive){
             setCurrencies(cryptoData);
             setTotalBalance(portfolioData.totalBalanceUsd);
+            setPortfolioAssets(portfolioData.assets);
             isLoaded.current = true;
           }
         } catch (e) {
@@ -54,6 +56,21 @@ const MainScreen: React.FC<MainProps> = ({ navigation }: MainProps) => {
 
     }, [userId])
   );
+  const handleCurrencyPress = (item: any) => {
+
+      const asset = portfolioAssets.find((a: any) => a.currency === item.name);
+      const ownedAmount = asset ? asset.balance : 0;
+      
+      const params = {
+          coinId: item.id,       
+          symbol: item.name,     
+          name: item.name,       
+          currentPrice: item.price,
+          priceChange: item.change,
+          ownedAmount: ownedAmount
+    };
+      navigation.navigate('Exchange', params);
+  };
 
   return (
     <View style={appStyles.flexContainer}>
@@ -81,7 +98,7 @@ const MainScreen: React.FC<MainProps> = ({ navigation }: MainProps) => {
             <Text style={appStyles.topUpText}>Top Up</Text>
           </TouchableOpacity>
         </View>
-        <InfoTrendCurrencies data={currencies} />
+        <InfoTrendCurrencies data={currencies} onPressItem={handleCurrencyPress} />
         <View style={appStyles.viewAllContainer}>
           <TouchableOpacity
             style={appStyles.viewAllButton}

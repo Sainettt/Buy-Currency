@@ -53,6 +53,26 @@ export const appStyles = StyleSheet.create({
   emptyListText: {
     textAlign: 'center', padding: 20, color: 'gray'
   },
+  priceCurrencyTextAndTotalValue: {
+    fontSize: 32,
+    fontFamily: 'Poppins-Bold',
+    color: '#FFFFFF',
+  },
+  totalValueText: {
+    fontSize: 14,
+    fontFamily: 'Poppins-Bold',
+    color: '#FFFFFF',
+  },
+  timeIntervalText: {
+    fontSize: 16,
+    fontFamily: 'Poppins-SemiBold',
+    color: '#9D9C9C',
+  },
+  selectedtimeIntervalText: {
+    fontSize: 16,
+    fontFamily: 'Poppins-SemiBold',
+    color: '#FFFFFF',
+  },
 
   topUpButton: {
     width: 115,
@@ -158,6 +178,13 @@ export const appStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  selectedtimeIntervalContainer: {
+    width: 50,
+    height: 30,
+    backgroundColor: '#5B5A5A',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   topUpContinueButton: {
     width: 230,
     height: 50,
@@ -186,5 +213,6 @@ export const appStyles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center'
-  }
+  },
+
 });

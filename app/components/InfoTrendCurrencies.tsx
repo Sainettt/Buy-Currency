@@ -6,9 +6,10 @@ import { Currency } from '../src/types/types';
 
 type Props = {
   data: Currency[];
+  onPressItem?: (item: Currency) => void;
 };
 
-const InfoTrendCurrencies: React.FC<Props> = ({ data }) => {
+const InfoTrendCurrencies: React.FC<Props> = ({ data, onPressItem }) => {
     
     return (
         <View> 
@@ -26,7 +27,7 @@ const InfoTrendCurrencies: React.FC<Props> = ({ data }) => {
             <View style={appStyles.trendHeaderContainer}>
                 <FlatList
                     data={data}
-                    renderItem={({ item }) => <CurrencyItem item={item} />}
+                    renderItem={({ item }) => <CurrencyItem item={item} onPress={onPressItem} />}
                     keyExtractor={(item) => item.id}
                     showsVerticalScrollIndicator={false} 
                     initialNumToRender={10}

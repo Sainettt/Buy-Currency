@@ -3,11 +3,16 @@ import { Text, View, TouchableOpacity, StyleSheet } from 'react-native';
 import { appStyles } from '../styles/appStyles';
 import { Currency } from '../src/types/types';
 
-const CurrencyItem = ({ item }: { item: Currency }) => {
+type Props = {
+  item: Currency;
+  onPress?: (item: Currency) => void;
+}
+
+const CurrencyItem: React.FC<Props> = ({ item, onPress }) => {
   const isPositive = parseFloat(item.change) >= 0;
 
   return (
-    <TouchableOpacity style={localStyles.itemRow}>
+    <TouchableOpacity style={localStyles.itemRow} onPress={() => onPress && onPress(item)}>
       <View>
         <Text style={appStyles.currencyNameAndPriceText}>{item.name}</Text>
       </View>

@@ -23,6 +23,14 @@ export const currencyAPI = {
         const response = await $api.get(`/currency/list?limit=${limit}`);
         return response.data;
     }
+    ,
+    async getHistory(symbol: string, period: string) {
+        // period: '1H', '1D', '1W', '1M', '1Y'
+        const response = await $api.get(`/currency/history`, {
+            params: { symbol, period }
+        });
+        return response.data; // returns { data: [...], changePercent, changeValue }
+    }
 };
 export const walletAPI = {
     async topUp(userId: number, amount: number) {
@@ -34,3 +42,4 @@ export const walletAPI = {
         return response.data;
     }
 }
+
