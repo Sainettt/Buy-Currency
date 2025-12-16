@@ -14,19 +14,55 @@ model User {
   password  String
   createdAt DateTime @default(now())
 
-  wallet   Wallet[]
-  bankCard BankCard?
+  wallet    Wallet? 
+  bankCard  BankCard?
 }
 
 model Wallet {
-  id       Int    @id @default(autoincrement())
-  currency String
-  balance  Float  @default(0.0)
+  id          Int     @id @default(autoincrement())
+  
+  balanceUsd  Float   @default(0.0) 
+  walletUid   String  @unique @default(uuid()) 
 
-  userId Int
-  user   User @relation(fields: [userId], references: [id])
+  userId      Int     @unique
+  user        User    @relation(fields: [userId], references: [id])
 
-  @@unique([userId, currency])
+  assets      Asset[]
+  transactions Transaction[]
+}
+
+model Asset {
+  id        Int     @id @default(autoincrement())
+  currency  String
+  balance   Float   @default(0.0)
+
+  walletId  Int
+  wallet    Wallet  @relation(fields: [walletId], references: [id])
+
+  @@unique([walletId, currency])
+}
+
+enum TransactionType {
+  BUY         
+  SELL        
+  DEPOSIT     
+  WITHDRAWAL 
+}
+
+model Transaction {
+  id        String   @id @default(uuid())
+  
+  type      TransactionType
+  
+  currency  String 
+  amount    Float 
+  price     Float  
+  totalUsd  Float
+
+  createdAt DateTime @default(now())
+
+  walletId  Int
+  wallet    Wallet   @relation(fields: [walletId], references: [id])
 }
 
 model BankCard {
@@ -36,6 +72,6 @@ model BankCard {
   cvv        String
   expiry     String
 
-  userId Int  @unique
-  user   User @relation(fields: [userId], references: [id])
+  userId     Int    @unique
+  user       User   @relation(fields: [userId], references: [id])
 }

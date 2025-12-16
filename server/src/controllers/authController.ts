@@ -5,26 +5,20 @@ import prisma from '../prisma';
 
 
 const generateFakeCardNumber = () => {
-    // 4276 - это бин Visa, остальные 12 цифр случайные
-    const part1 = Math.floor(1000 + Math.random() * 9000); // 4 цифры
-    const part2 = Math.floor(1000 + Math.random() * 9000); // 4 цифры
-    const part3 = Math.floor(1000 + Math.random() * 9000); // 4 цифры
+    const part1 = Math.floor(1000 + Math.random() * 9000);
+    const part2 = Math.floor(1000 + Math.random() * 9000);
+    const part3 = Math.floor(1000 + Math.random() * 9000);
     return `4276 ${part1} ${part2} ${part3}`;
 };
-
 
 const generateRandomCVV = () => {
     return Math.floor(100 + Math.random() * 900).toString();
 };
 
-
 const generateRandomExpiry = () => {
-
     const month = Math.floor(1 + Math.random() * 12).toString().padStart(2, '0');
-    
-    const currentYear = new Date().getFullYear() % 100; 
+    const currentYear = new Date().getFullYear() % 100;
     const year = (currentYear + Math.floor(2 + Math.random() * 5)).toString();
-    
     return `${month}/${year}`;
 };
 
@@ -55,35 +49,39 @@ class AuthController {
 
             const user = await prisma.user.create({
                 data: {
-                    username: userName, 
+                    username: userName,
                     email,
                     password: hashPassword,
                     
                     bankCard: {
                         create: {
                             cardNumber: generateFakeCardNumber(),
-                            cvv: generateRandomCVV(),       
-                            expiry: generateRandomExpiry(), 
-                            balance: 10000.0 
+                            cvv: generateRandomCVV(),
+                            expiry: generateRandomExpiry(),
+                            balance: 10000.0
                         }
                     },
+                    
                     wallet: {
                         create: {
-                            currency: 'USD',
-                            balance: 0.0
+                            balanceUsd: 0.0,
                         }
                     }
+                },
+                include: {
+                    wallet: true
                 }
             });
 
             const token = generateJwt(user.id, user.email, user.username, user.createdAt);
 
-            return res.json({ 
+            return res.json({
                 token,
                 user: {
                     id: user.id,
                     email: user.email,
-                    username: user.username
+                    username: user.username,
+                    walletUid: user.wallet?.walletUid
                 }
             });
         } catch (e) {
@@ -96,7 +94,7 @@ class AuthController {
         try {
             const { email, password } = req.body;
 
-            const user = await prisma.user.findUnique({ 
+            const user = await prisma.user.findUnique({
                 where: { email },
                 include: {
                     bankCard: true,
@@ -118,7 +116,7 @@ class AuthController {
                     data: {
                         userId: user.id,
                         cardNumber: generateFakeCardNumber(),
-                        cvv: generateRandomCVV(),       
+                        cvv: generateRandomCVV(),
                         expiry: generateRandomExpiry(),
                         balance: 10000.0
                     }
@@ -126,26 +124,26 @@ class AuthController {
                 console.log(`[Login Fix] Created missing bank card for user ${user.id}`);
             }
 
-            const hasUsdWallet = user.wallet.some(w => w.currency === 'USD');
-            if (!hasUsdWallet) {
-                await prisma.wallet.create({
+            let userWallet = user.wallet;
+            if (!userWallet) {
+                userWallet = await prisma.wallet.create({
                     data: {
                         userId: user.id,
-                        currency: 'USD',
-                        balance: 0.0
+                        balanceUsd: 0.0
                     }
                 });
-                console.log(`[Login Fix] Created missing USD wallet for user ${user.id}`);
+                console.log(`[Login Fix] Created missing Wallet for user ${user.id}`);
             }
-            
+
             const token = generateJwt(user.id, user.email, user.username, user.createdAt);
 
-            return res.json({ 
+            return res.json({
                 token,
                 user: {
                     id: user.id,
                     email: user.email,
-                    username: user.username
+                    username: user.username,
+                    walletUid: userWallet.walletUid
                 }
             });
         } catch (e) {

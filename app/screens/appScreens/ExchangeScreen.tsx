@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   Text,
   View,
-  TouchableOpacity,
   StyleSheet,
   Dimensions,
 } from 'react-native';
@@ -94,7 +93,6 @@ const ExchangeScreen: React.FC<ExchangeScreenProps> = ({
   );
 
   const isPositive = parseFloat(priceChangePercent) >= 0;
-  const chartColor = isPositive ? '131, 237, 166' : '235, 91, 91'; // RGB коды для #83EDA6 и #EB5B5B
   const balanceInUsd = (Number(ownedAmount) * Number(currentPrice)).toFixed(2);
 
   return (

@@ -12,7 +12,6 @@ class CurrencyController {
             const now = Date.now();
 
             if (cryptoCache.length > 0 && (now - lastFetchTime < CACHE_DURATION)) {
-                // console.log('Serving from cache'); // For debugging
                 return res.json(cryptoCache.slice(0, limit));
             }
 

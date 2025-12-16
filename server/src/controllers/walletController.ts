@@ -14,17 +14,32 @@ class WalletController {
                 return res.status(400).json({ message: 'Error with bank card or insufficient funds' });
             }
             
-            await prisma.$transaction(async (tx) => {
+            const wallet = await prisma.wallet.findUnique({ where: { userId } });
+            if (!wallet) {
+                return res.status(404).json({ message: 'Wallet not found' });
+            }
 
+            await prisma.$transaction(async (tx) => {
+                
                 await tx.bankCard.update({
                     where: { userId },
                     data: { balance: { decrement: amount } }
                 });
 
-                await tx.wallet.upsert({
-                    where: { userId_currency: { userId, currency: 'USD' } },
-                    update: { balance: { increment: amount } },
-                    create: { userId, currency: 'USD', balance: amount }
+                await tx.wallet.update({
+                    where: { id: wallet.id },
+                    data: { balanceUsd: { increment: amount } }
+                });
+
+                await tx.transaction.create({
+                    data: {
+                        walletId: wallet.id,
+                        type: 'DEPOSIT',
+                        currency: 'USD',
+                        amount: amount,
+                        price: 1.0,        
+                        totalUsd: amount
+                    }
                 });
             });
 
@@ -39,60 +54,70 @@ class WalletController {
         try {
             const userId = parseInt(req.params.userId);
 
-            const walletItems = await prisma.wallet.findMany({
-                where: { userId }
+
+            const wallet = await prisma.wallet.findUnique({
+                where: { userId },
+                include: { assets: true }
             });
 
-            if (walletItems.length === 0) {
-                return res.json({ totalBalanceUsd: "0.00", assets: [] });
+            if (!wallet) {
+                return res.json({ 
+                    totalBalanceUsd: "0.00", 
+                    assets: [], 
+                    walletUid: null 
+                });
             }
 
-            const cryptoSymbols = walletItems
-                .filter(item => item.currency !== 'USD')
-                .map(item => `${item.currency}USDT`);
+            const cryptoSymbols = wallet.assets
+                .map(asset => `${asset.currency}USDT`);
 
             let prices: Record<string, number> = {};
 
             if (cryptoSymbols.length > 0) {
-
-                const { data } = await binanceApi.get('/ticker/price');
-                
-                data.forEach((ticker: any) => {
-                    if (cryptoSymbols.includes(ticker.symbol)) {
-                        prices[ticker.symbol] = parseFloat(ticker.price);
-                    }
-                });
+                try {
+                    const { data } = await binanceApi.get('/ticker/price');
+                    data.forEach((ticker: any) => {
+                        if (cryptoSymbols.includes(ticker.symbol)) {
+                            prices[ticker.symbol] = parseFloat(ticker.price);
+                        }
+                    });
+                } catch (binanceError) {
+                    console.error("Binance API error:", binanceError);
+                }
             }
 
-            let totalBalanceUsd = 0;
+            let totalBalanceUsd = wallet.balanceUsd; 
 
-            const detailedPortfolio = walletItems.map(item => {
-                let valueInUsd = 0;
-                let currentPrice = 0;
-
-                if (item.currency === 'USD') {
-                    valueInUsd = item.balance;
-                    currentPrice = 1;
-                } else {
-                    const tickerName = `${item.currency}USDT`;
-                    currentPrice = prices[tickerName] || 0;
-                    valueInUsd = item.balance * currentPrice;
-                }
+            const detailedAssets = wallet.assets.map(asset => {
+                const tickerName = `${asset.currency}USDT`;
+                const currentPrice = prices[tickerName] || 0;
+                const valueInUsd = asset.balance * currentPrice;
 
                 totalBalanceUsd += valueInUsd;
 
                 return {
-                    id: item.id,
-                    currency: item.currency, 
-                    balance: item.balance,   
-                    price: currentPrice,    
+                    id: asset.id,
+                    currency: asset.currency,
+                    balance: asset.balance,
+                    price: currentPrice,
                     valueUsd: valueInUsd.toFixed(2)
                 };
             });
 
+            if (wallet.balanceUsd > 0) {
+                detailedAssets.unshift({
+                    id: 0,
+                    currency: 'USD',
+                    balance: wallet.balanceUsd,
+                    price: 1,
+                    valueUsd: wallet.balanceUsd.toFixed(2)
+                });
+            }
+
             return res.json({
                 totalBalanceUsd: totalBalanceUsd.toFixed(2),
-                assets: detailedPortfolio
+                walletUid: wallet.walletUid,
+                assets: detailedAssets
             });
 
         } catch (e) {
