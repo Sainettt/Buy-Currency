@@ -5,7 +5,7 @@ import BottomBar from '../../components/BottomBar';
 import { appStyles } from '../../styles/appStyles';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AppStackParamList } from '../../src/navigation/appTypes';
-import UpperTextScreen from '../../components/UpperTextScreen';
+import UpperText from '../../components/UpperText';
 import CurrencyItem from '../../components/CurrencyItem';
 import { currencyAPI } from '../../services/api';
 import { Currency } from '../../src/types/types';
@@ -17,16 +17,14 @@ type AllCurrenciesProps = NativeStackScreenProps<
 const AllCurrenciesScreen: React.FC<AllCurrenciesProps> = ({ navigation }) => {
   const [allCurrencies, setAllCurrencies] = useState<Currency[]>([]);
   const [loading, setLoading] = useState(false);
-  const isLoaded = useRef(false)
+  const isLoaded = useRef(false);
 
   useFocusEffect(
     useCallback(() => {
-
       let isActive = true;
       const fetchAllCurrencies = async () => {
-
         if (!isLoaded.current) {
-            setLoading(true);
+          setLoading(true);
         }
         try {
           const data = await currencyAPI.getTopCryptos(100);
@@ -46,37 +44,34 @@ const AllCurrenciesScreen: React.FC<AllCurrenciesProps> = ({ navigation }) => {
         isActive = false;
         clearInterval(intervalId);
       };
-    }, []) 
+    }, []),
   );
 
   return (
     <View style={appStyles.flexContainer}>
       <View style={appStyles.containerWithoutPadding}>
-        <UpperTextScreen
+        <UpperText
           title="All Currencies"
           onPress={() => navigation.goBack()}
         />
         {loading && allCurrencies.length === 0 ? (
           <View style={appStyles.indicatorStyle}>
-              <ActivityIndicator size="large" color="#83EDA6" />
-           </View>
-        ) :
-        (
-
+            <ActivityIndicator size="large" color="#83EDA6" />
+          </View>
+        ) : (
           <FlatList
             data={allCurrencies}
             renderItem={({ item }) => <CurrencyItem item={item} />}
             keyExtractor={item => item.id}
             showsVerticalScrollIndicator={false}
-            initialNumToRender={20} 
+            initialNumToRender={20}
             maxToRenderPerBatch={10}
             windowSize={5}
             ListEmptyComponent={
               <Text style={appStyles.emptyListText}>Loading data...</Text>
             }
           />
-        )
-        }
+        )}
       </View>
       <BottomBar
         homePress={() => navigation.navigate('Main')}

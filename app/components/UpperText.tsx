@@ -7,7 +7,7 @@ type UpperTextScreenProps = {
     title: string;
     onPress: () => void;
 }
-const UpperTextScreen: React.FC<UpperTextScreenProps> = ({ title, onPress })=> {
+const UpperText: React.FC<UpperTextScreenProps> = ({ title, onPress })=> {
   return (
     <View style={appStyles.upperTextContainer}>
       <TouchableOpacity
@@ -23,4 +23,4 @@ const UpperTextScreen: React.FC<UpperTextScreenProps> = ({ title, onPress })=> {
     </View>
   );
 };
-export default UpperTextScreen;
+export default UpperText;

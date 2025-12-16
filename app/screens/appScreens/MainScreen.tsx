@@ -1,5 +1,5 @@
 import React, { useState, useContext, useCallback, useRef} from 'react';
-import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { appStyles } from '../../styles/appStyles';
 import InfoTrendCurrencies from '../../components/InfoTrendCurrencies';
@@ -8,7 +8,7 @@ import { AppStackParamList } from '../../src/navigation/appTypes';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { currencyAPI, walletAPI } from '../../services/api';
 import { AuthContext } from '../../context/AuthContext';
-
+import  TotalBalance  from '../../components/TotalBalance';
 type MainProps = NativeStackScreenProps<AppStackParamList, 'Main'>;
 
 const MainScreen: React.FC<MainProps> = ({ navigation }: MainProps) => {
@@ -78,26 +78,11 @@ const MainScreen: React.FC<MainProps> = ({ navigation }: MainProps) => {
         <View style={appStyles.headerContainer}>
           <Text style={appStyles.titleHeader}>Trending currencies</Text>
         </View>
-        <View style={appStyles.totalBalanceContainer}>
-          <Text style={appStyles.totalBalanceText}>Total balance</Text>
-        </View>
-        <View style={appStyles.balanceContainer}>
-          {loading ? (
-            <View style={appStyles.indicatorStyle}>
-                <ActivityIndicator size="large" color="#83EDA6" />
-             </View>
-          ) : (
-            <Text style={appStyles.balanceText}>{totalBalance}$</Text>
-          )}
-          <TouchableOpacity
-            style={appStyles.topUpButton}
-            onPress={() => {
-              navigation.navigate('PaymentMethod');
-            }}
-          >
-            <Text style={appStyles.topUpText}>Top Up</Text>
-          </TouchableOpacity>
-        </View>
+        <TotalBalance
+          balance={totalBalance}
+          onTopUpPress={() => navigation.navigate('BalanceTopUp')}
+          loading={loading}
+        />
         <InfoTrendCurrencies data={currencies} onPressItem={handleCurrencyPress} />
         <View style={appStyles.viewAllContainer}>
           <TouchableOpacity

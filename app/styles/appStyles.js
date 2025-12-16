@@ -19,6 +19,9 @@ export const appStyles = StyleSheet.create({
     fontSize: 46,
     fontFamily: 'Poppins-Bold',
     color: '#FFFFFF',
+    includeFontPadding: false,
+    textAlignVertical: 'center', 
+    lineHeight: 50,
   },
   viewAllText: {
     fontSize: 18,
@@ -109,12 +112,16 @@ export const appStyles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     flexDirection: 'row',
+    paddingVertical: 0,
   },
   headerContainer: {
     alignItems: 'center',
-    marginBottom: 25,
+    marginBottom: 20,
+    marginTop: 10,
   },
-  totalBalanceContainer: {},
+  totalBalanceContainer: {
+    marginTop: 10,
+  },
   viewAllContainer: {
     alignItems: 'center',
     marginTop: 15,

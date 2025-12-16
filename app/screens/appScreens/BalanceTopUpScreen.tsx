@@ -14,7 +14,7 @@ import { appStyles } from '../../styles/appStyles';
 import BottomBar from '../../components/BottomBar';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AppStackParamList } from '../../src/navigation/appTypes';
-import UpperTextScreen from '../../components/UpperTextScreen';
+import UpperText from '../../components/UpperText';
 import { AuthContext } from '../../context/AuthContext';
 import { walletAPI } from '../../services/api';
 
@@ -126,7 +126,7 @@ const BalanceTopUpScreen: React.FC<BalanceTopUpScreenProps> = ({
   return (
     <View style={appStyles.flexContainer}>
       <View style={appStyles.container}>
-        <UpperTextScreen
+        <UpperText
           title="Top Up Balance"
           onPress={() => navigation.goBack()}
         />
