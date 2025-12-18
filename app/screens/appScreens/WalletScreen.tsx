@@ -1,82 +1,135 @@
-import React, { useState } from 'react';
-import { View, FlatList } from 'react-native';
-// Правильный импорт для замены deprecated компонента
+import React, { useState, useRef, useContext, useCallback } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+import { View, FlatList, Text } from 'react-native';
+
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { appStyles } from '../../styles/appStyles';
 
-// Импорт компонентов
 import BottomBar from '../../components/BottomBar';
 import UpperText from '../../components/UpperText';
 import WalletHeader from '../../components/WalletHeader';
 import WalletAssetItem from '../../components/WalletAssetItem';
+import { AuthContext } from '../../context/AuthContext';
 
-// Тип данных (лучше вынести в types.ts)
+import { walletAPI } from '../../services/api';
+
 type Asset = {
   id: string;
   symbol: string;
   name: string;
   amount: number;
   value: number;
+  price: number;
   change: number;
 };
 
-const assetsData: Asset[] = [
-  { id: '1', symbol: 'ETH', name: 'Ethereum', amount: 150, value: 3201.71, change: 2.4 },
-  { id: '2', symbol: 'USD', name: 'US Dollar', amount: 200, value: 3.81, change: 0 }, 
-  { id: '3', symbol: 'GBP', name: 'British Pound', amount: 100, value: 4.85, change: -0.5 },
-  { id: '3', symbol: 'GBP', name: 'British Pound', amount: 100, value: 4.85, change: -0.5 },
-  { id: '3', symbol: 'GBP', name: 'British Pound', amount: 100, value: 4.85, change: -0.5 },
-  { id: '3', symbol: 'GBP', name: 'British Pound', amount: 100, value: 4.85, change: -0.5 },
-  { id: '3', symbol: 'GBP', name: 'British Pound', amount: 100, value: 4.85, change: -0.5 },
-  { id: '3', symbol: 'GBP', name: 'British Pound', amount: 100, value: 4.85, change: -0.5 },
-  { id: '3', symbol: 'GBP', name: 'British Pound', amount: 100, value: 4.85, change: -0.5 },
-];
-
 const WalletScreen = ({ navigation }: any) => {
+  const { userId } = useContext(AuthContext);
+  const [totalBalance, setTotalBalance] = useState('0.00');
+  const [portfolioAssets, setPortfolioAssets] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const [portfolioStats, setPortfolioStats] = useState({
+    val: '0.00',
+    pct: '0.00',
+  });
+  const isLoaded = useRef(false);
 
-  const handleTopUp = () => {
-    console.log('Top Up pressed');
-    // navigation.navigate('BalanceTopUpScreen');
-  };
+  useFocusEffect(
+    useCallback(() => {
+      let isActive = true;
+
+      const fetchWalletData = async () => {
+        if (!userId) return;
+        if (!isLoaded.current) setLoading(true);
+
+        try {
+          const data = await walletAPI.getPortfolio(Number(userId));
+
+          if (isActive) {
+            setTotalBalance(data.totalBalanceUsd);
+            setPortfolioAssets(data.assets);
+            setPortfolioStats({
+              val: data.totalChangeValue,
+              pct: data.totalChangePercent,
+            });
+            isLoaded.current = true;
+          }
+        } catch (e) {
+          console.log('Error fetching wallet:', e);
+        } finally {
+          if (isActive) setLoading(false);
+        }
+      };
+
+      fetchWalletData();
+      const intervalId = setInterval(fetchWalletData, 5000);
+
+      return () => {
+        isActive = false;
+        clearInterval(intervalId);
+      };
+    }, [userId]),
+  );
 
   const handleAssetPress = (item: Asset) => {
-    console.log('Pressed asset:', item.symbol);
+    if (item.symbol === 'USD') return;
+    const tradingPairId = `${item.symbol}USDT`;
+
+    navigation.navigate('Exchange', {
+      coinId: tradingPairId,
+      symbol: item.symbol,
+      name: item.name,
+      currentPrice: item.price,
+      priceChange: item.change,
+      ownedAmount: item.amount,
+    });
   };
 
   return (
-    // edges={['top']} оставляет отступ только сверху, так как BottomBar и так внизу
-    <SafeAreaView style={appStyles.containerWithoutPadding} edges={['top', 'left', 'right']}>
-      
-      <UpperText title="Wallet" onPress={() => navigation.goBack()}/>
+    <SafeAreaView
+      style={appStyles.containerWithoutPadding}
+      edges={['top', 'left', 'right']}
+    >
+      <UpperText title="Wallet" onPress={() => navigation.goBack()} />
 
-      {/* Список занимает все свободное место (flex: 1) */}
       <View style={{ flex: 1 }}>
         <FlatList
-          data={assetsData}
-          keyExtractor={(item) => item.id}
-          // Рендерим элемент через наш новый компонент
+          data={portfolioAssets}
+          keyExtractor={item => item.id}
           renderItem={({ item }) => (
-            <WalletAssetItem item={item} onPress={handleAssetPress} />
-          )}
-          // Рендерим шапку через наш новый компонент
-          ListHeaderComponent={
-            <WalletHeader 
-              balance="500,23" 
-              loading={loading} 
-              onTopUpPress={handleTopUp} 
+            <WalletAssetItem
+              item={item}
+              onPress={() => handleAssetPress(item)}
             />
+          )}
+          ListHeaderComponent={
+            <WalletHeader
+              balance={`${totalBalance}`}
+              changeValue={portfolioStats.val}
+              changePercent={portfolioStats.pct}
+              loading={loading && !isLoaded.current}
+              onTopUpPress={() => navigation.navigate('BalanceTopUp')}
+            />
+          }
+          ListEmptyComponent={
+            !loading ? (
+              <View style={{ padding: 20, alignItems: 'center' }}>
+                <Text style={{ color: '#999' }}>No assets found</Text>
+              </View>
+            ) : null
           }
           contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 20 }}
           showsVerticalScrollIndicator={false}
         />
       </View>
 
-      {/* Нижний бар прижат к низу */}
       <View>
-        <BottomBar homePress={() => navigation.navigate("Main")} walletPress={() => navigation.navigate("Wallet")} transactionPress={() => {}} /> 
+        <BottomBar
+          homePress={() => navigation.navigate('Main')}
+          walletPress={() => {}}
+          transactionPress={() => navigation.navigate('TransactionHistory')}
+        />
       </View>
-
     </SafeAreaView>
   );
 };

@@ -66,11 +66,11 @@ const ExchangeScreen: React.FC<ExchangeScreenProps> = ({
     try {
       const portfolio = await walletAPI.getPortfolio(userId);
 
-      const asset = portfolio.assets.find((a: any) => a.currency === symbol);
-      setOwnedAmount(asset ? asset.balance : 0);
+      const asset = portfolio.assets.find((a: any) => a.symbol === symbol);
+      setOwnedAmount(asset ? asset.amount : 0);
 
-      const usdAsset = portfolio.assets.find((a: any) => a.currency === 'USD');
-      const usdBalance = usdAsset ? usdAsset.balance : 0;
+      const usdAsset = portfolio.assets.find((a: any) => a.symbol === 'USD');
+      const usdBalance = usdAsset ? usdAsset.amount : 0;
 
       setWalletUsdBalance(usdBalance.toFixed(2));
     } catch (e) {

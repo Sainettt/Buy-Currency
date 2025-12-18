@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { View, Text, TouchableOpacity, Image } from 'react-native';
+import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { appStyles } from '../styles/appStyles';
 
 type UpperTextScreenProps = {
@@ -16,11 +16,16 @@ const UpperText: React.FC<UpperTextScreenProps> = ({ title, onPress })=> {
       >
         <Image
           source={require('../assets/images/arrow.png')}
-          style={{ width: 20, height: 15 }}
+          style={styles.imageContainer}
         />
       </TouchableOpacity>
       <Text style={appStyles.title}>{title}</Text>
     </View>
   );
 };
+const styles = StyleSheet.create({
+  imageContainer: {
+    width: 20, height: 15
+  }
+});
 export default UpperText;

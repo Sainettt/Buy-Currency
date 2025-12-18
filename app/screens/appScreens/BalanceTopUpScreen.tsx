@@ -185,7 +185,7 @@ const BalanceTopUpScreen: React.FC<BalanceTopUpScreenProps> = ({
         homePress={() => {
           navigation.navigate('Main');
         }}
-        walletPress={() => {}}
+        walletPress={() => {navigation.navigate('Wallet')}}
         transactionPress={() => {}}
       />
 

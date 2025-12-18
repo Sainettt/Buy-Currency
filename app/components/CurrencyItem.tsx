@@ -5,14 +5,14 @@ import { Currency } from '../src/types/types';
 
 type Props = {
   item: Currency;
-  onPress?: (item: Currency) => void;
+  onPressItem?: (item: Currency) => void;
 }
 
-const CurrencyItem: React.FC<Props> = ({ item, onPress }) => {
+const CurrencyItem: React.FC<Props> = ({ item, onPressItem }) => {
   const isPositive = parseFloat(item.change) >= 0;
 
   return (
-    <TouchableOpacity style={localStyles.itemRow} onPress={() => onPress && onPress(item)}>
+    <TouchableOpacity style={localStyles.itemRow} onPress={() => onPressItem && onPressItem(item)}>
       <View>
         <Text style={appStyles.currencyNameAndPriceText}>{item.name}</Text>
       </View>

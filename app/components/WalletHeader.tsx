@@ -6,34 +6,31 @@ type Props = {
   balance: string;
   loading?: boolean;
   onTopUpPress: () => void;
+  changeValue?: string;   
+  changePercent?: string;
 };
 
-const WalletHeader: React.FC<Props> = ({ balance, loading = false, onTopUpPress }) => {
+const WalletHeader: React.FC<Props> = ({ balance, changeValue, changePercent,loading = false, onTopUpPress }) => {
   return (
     <View style={styles.headerWrapper}>
       <TotalBalance 
         balance={balance} 
-        loading={loading} 
+        loading={loading}
+        changeValue={changeValue}
+        changePercent={changePercent} 
         onTopUpPress={onTopUpPress} 
       />
 
-      {/* ГЛАВНОЕ ИСПРАВЛЕНИЕ:
-         Мы создаем строку, которая точно повторяет структуру WalletAssetItem.
-         Три колонки, каждая flex: 1.
-      */}
       <View style={styles.tableHeaderRow}>
         
-        {/* 1. Левая колонка (Coin) - выравнивание влево */}
         <View style={styles.leftSide}>
           <Text style={styles.columnHeaderText}>Coin</Text>
         </View>
 
-        {/* 2. Центральная колонка (Holdings) - выравнивание по центру */}
         <View style={styles.centerSide}>
           <Text style={styles.columnHeaderText}>Holdings</Text>
         </View>
 
-        {/* 3. Правая колонка (Value) - выравнивание вправо */}
         <View style={styles.rightSide}>
           <Text style={styles.columnHeaderText}>Value</Text>
         </View>
@@ -56,36 +53,34 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,      
   },
   
-  // Контейнер строки заголовков
   tableHeaderRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 10, // Важно: такой же паддинг, как в WalletAssetItem
+    paddingHorizontal: 10, 
     marginBottom: 5,
     marginTop: 30,
-    borderBottomWidth: 1, // Опционально: можно добавить линию под заголовками
+    borderBottomWidth: 1,
     borderBottomColor: '#4A4A4A',
   },
 
-  // Стили колонок - ТОЧНАЯ КОПИЯ из WalletAssetItem
   leftSide: {
     flex: 1,
-    alignItems: 'flex-start', // Прижато влево
+    alignItems: 'flex-start', 
   },
   centerSide: {
     flex: 1,
-    alignItems: 'center', // По центру
+    alignItems: 'center',
   },
   rightSide: {
     flex: 1,
-    alignItems: 'flex-end', // Прижато вправо
+    alignItems: 'flex-end',
   },
 
   columnHeaderText: {
-    color: '#FFFFFF', // Серый цвет для заголовков таблицы (так профессиональнее)
+    color: '#FFFFFF',
     fontFamily: 'Poppins-Bold',
-    fontSize: 14,     // Чуть меньше чем основной текст
+    fontSize: 14,
   },
 });
 

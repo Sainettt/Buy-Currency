@@ -3,21 +3,20 @@ import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
 
 type Props = {
-    data: any[];       // Данные с сервера (массив объектов { value: number, ... })
-    loading: boolean;  // Состояние загрузки
-    isPositive: boolean; // Растет (+) или падает (-) цена
-    width: number;     // Ширина графика
+    data: any[];  
+    loading: boolean;  
+    isPositive: boolean; 
+    width: number;     
 };
 
 export const CryptoChart: React.FC<Props> = ({ data, loading, isPositive, width }) => {
     
-    // Определяем цвет (Зеленый или Красный)
     const chartColor = isPositive ? '131, 237, 166' : '235, 91, 91';
 
     return (
         <View style={styles.chartContainer}>
             {loading ? (
-                <ActivityIndicator size="large" color="#83EDA6" style={{ marginTop: 50 }} />
+                <ActivityIndicator size="large" color="#83EDA6" style={styles.indicator} />
             ) : (
                 data.length > 0 && (
                     <LineChart
@@ -71,5 +70,8 @@ const styles = StyleSheet.create({
         paddingRight: 0, 
         paddingLeft: 0, 
         marginLeft: 10 
+    },
+    indicator: {
+        marginTop: 50,
     },
 });

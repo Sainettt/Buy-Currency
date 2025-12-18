@@ -47,7 +47,7 @@ const PaymentMethodScreen: React.FC<PaymentMethodProps> = ({ navigation }) => {
       </View>
       <BottomBar
         homePress={() => navigation.navigate('Main')}
-        walletPress={() => {}}
+        walletPress={() => {navigation.navigate('Wallet')}}
         transactionPress={() => {}}
       />
     </View>

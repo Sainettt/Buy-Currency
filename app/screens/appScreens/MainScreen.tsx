@@ -16,6 +16,10 @@ const MainScreen: React.FC<MainProps> = ({ navigation }: MainProps) => {
   const [totalBalance, setTotalBalance] = useState('0.00');
   const [currencies, setCurrencies] = useState([]);
   const [portfolioAssets, setPortfolioAssets] = useState<any[]>([]);
+  const [portfolioStats, setPortfolioStats] = useState({
+      val: '0.00',
+      pct: '0.00',
+    });
   const [loading, setLoading] = useState(false);
 
   const isLoaded = useRef(false);
@@ -37,6 +41,10 @@ const MainScreen: React.FC<MainProps> = ({ navigation }: MainProps) => {
             setCurrencies(cryptoData);
             setTotalBalance(portfolioData.totalBalanceUsd);
             setPortfolioAssets(portfolioData.assets);
+            setPortfolioStats({
+              val: portfolioData.totalChangeValue,
+              pct: portfolioData.totalChangePercent,
+            });
             isLoaded.current = true;
           }
         } catch (e) {
@@ -58,8 +66,8 @@ const MainScreen: React.FC<MainProps> = ({ navigation }: MainProps) => {
   );
   const handleCurrencyPress = (item: any) => {
 
-      const asset = portfolioAssets.find((a: any) => a.currency === item.name);
-      const ownedAmount = asset ? asset.balance : 0;
+      const asset = portfolioAssets.find((a: any) => a.symbol === item.name);
+      const ownedAmount = asset ? asset.amount : 0;
       
       const params = {
           coinId: item.id,       
@@ -69,6 +77,7 @@ const MainScreen: React.FC<MainProps> = ({ navigation }: MainProps) => {
           priceChange: item.change,
           ownedAmount: ownedAmount
     };
+    console.log(item.name)
       navigation.navigate('Exchange', params);
   };
 
@@ -81,6 +90,8 @@ const MainScreen: React.FC<MainProps> = ({ navigation }: MainProps) => {
         <TotalBalance
           balance={totalBalance}
           onTopUpPress={() => navigation.navigate('BalanceTopUp')}
+          changeValue={portfolioStats.val}
+          changePercent={portfolioStats.pct}
           loading={loading}
         />
         <InfoTrendCurrencies data={currencies} onPressItem={handleCurrencyPress} />

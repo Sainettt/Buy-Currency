@@ -14,7 +14,7 @@ const PaymentMethodContainer: React.FC<PaymentMethodContainerProps> = ({ logo, s
         <Image source={logo} style={styleLogo} />
       </View>
       <Image source={require('../assets/images/arrowPayment.png')}
-          style={{ width: 15, height: 15 }} />
+          style={styles.imageContainer} />
     </TouchableOpacity>
   );
 };
@@ -57,6 +57,9 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontWeight: '300',
   },
+  imageContainer: {
+    width: 15, height: 15
+  }
 });
 
 export default PaymentMethodContainer;

@@ -2,9 +2,9 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
 type Props = {
-    intervals: string[];                // ['1H', '1D', ...]
-    selectedInterval: string;           // Текущий выбранный
-    onSelect: (interval: string) => void; // Функция при нажатии
+    intervals: string[];                
+    selectedInterval: string;           
+    onSelect: (interval: string) => void; 
 };
 
 export const IntervalSelector: React.FC<Props> = ({ intervals, selectedInterval, onSelect }) => {

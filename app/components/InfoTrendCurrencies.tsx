@@ -27,7 +27,7 @@ const InfoTrendCurrencies: React.FC<Props> = ({ data, onPressItem }) => {
             <View style={appStyles.trendHeaderContainer}>
                 <FlatList
                     data={data}
-                    renderItem={({ item }) => <CurrencyItem item={item} onPress={onPressItem} />}
+                    renderItem={({ item }) => <CurrencyItem item={item} onPressItem={onPressItem} />}
                     keyExtractor={(item) => item.id}
                     showsVerticalScrollIndicator={false} 
                     initialNumToRender={10}
