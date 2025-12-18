@@ -91,6 +91,10 @@ export const walletAPI = {
     async getTransactions(userId: number) {
         const response = await $api.get(`/wallet/${userId}/transactions`);
         return response.data;
+    },
+    async withdraw(userId: number, amount: number) {
+        const response = await $api.post('/wallet/withdraw', { userId, amount });
+        return response.data;
     }
 }
 

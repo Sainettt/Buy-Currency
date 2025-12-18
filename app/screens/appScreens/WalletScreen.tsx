@@ -1,6 +1,6 @@
 import React, { useState, useRef, useContext, useCallback } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
-import { View, FlatList, Text } from 'react-native';
+import { View, FlatList, Text, StyleSheet } from 'react-native';
 
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { appStyles } from '../../styles/appStyles';
@@ -12,6 +12,7 @@ import WalletAssetItem from '../../components/WalletAssetItem';
 import { AuthContext } from '../../context/AuthContext';
 
 import { walletAPI } from '../../services/api';
+
 
 type Asset = {
   id: string;
@@ -92,7 +93,7 @@ const WalletScreen = ({ navigation }: any) => {
     >
       <UpperText title="Wallet" onPress={() => navigation.goBack()} />
 
-      <View style={{ flex: 1 }}>
+      <View style={appStyles.flexContainer}>
         <FlatList
           data={portfolioAssets}
           keyExtractor={item => item.id}
@@ -109,16 +110,17 @@ const WalletScreen = ({ navigation }: any) => {
               changePercent={portfolioStats.pct}
               loading={loading && !isLoaded.current}
               onTopUpPress={() => navigation.navigate('BalanceTopUp')}
+              onWithdrawPress={() => navigation.navigate('Withdraw')}
             />
           }
           ListEmptyComponent={
             !loading ? (
-              <View style={{ padding: 20, alignItems: 'center' }}>
-                <Text style={{ color: '#999' }}>No assets found</Text>
+              <View style={styles.listEmptyContainer}>
+                <Text style={styles.noAssetsFoundText}>No assets found</Text>
               </View>
             ) : null
           }
-          contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 20 }}
+          contentContainerStyle={styles.contentContainerStyle}
           showsVerticalScrollIndicator={false}
         />
       </View>
@@ -133,5 +135,10 @@ const WalletScreen = ({ navigation }: any) => {
     </SafeAreaView>
   );
 };
+const styles = StyleSheet.create({
+  contentContainerStyle: { paddingHorizontal: 20, paddingBottom: 20 },
+  noAssetsFoundText: {color: '#999'},
+  listEmptyContainer: {padding: 20, alignItems: 'center'}
+})
 
 export default WalletScreen;

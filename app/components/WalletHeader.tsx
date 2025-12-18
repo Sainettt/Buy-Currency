@@ -6,11 +6,12 @@ type Props = {
   balance: string;
   loading?: boolean;
   onTopUpPress: () => void;
+  onWithdrawPress: () => void;
   changeValue?: string;   
   changePercent?: string;
 };
 
-const WalletHeader: React.FC<Props> = ({ balance, changeValue, changePercent,loading = false, onTopUpPress }) => {
+const WalletHeader: React.FC<Props> = ({ balance, changeValue, changePercent,loading = false, onTopUpPress, onWithdrawPress }) => {
   return (
     <View style={styles.headerWrapper}>
       <TotalBalance 
@@ -18,7 +19,8 @@ const WalletHeader: React.FC<Props> = ({ balance, changeValue, changePercent,loa
         loading={loading}
         changeValue={changeValue}
         changePercent={changePercent} 
-        onTopUpPress={onTopUpPress} 
+        onTopUpPress={onTopUpPress}
+        onWithdrawPress={onWithdrawPress} 
       />
 
       <View style={styles.tableHeaderRow}>

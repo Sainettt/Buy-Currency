@@ -221,5 +221,16 @@ export const appStyles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center'
   },
-
+  greenBackGroudColor : {
+    backgroundColor: '#83EDA6'
+  },
+  redBackGroudColor: {
+    backgroundColor: '#EB5B5B'
+  },
+  green: {
+    color: '#83EDA6'
+  },
+  red: {
+    color: '#EB5B5B'
+  },
 });

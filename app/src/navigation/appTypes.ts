@@ -13,4 +13,5 @@ export type AppStackParamList = {
   PaymentMethod: undefined;
   Wallet: undefined;
   TransactionHistory: undefined
+  Withdraw: undefined
 };

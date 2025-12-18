@@ -41,7 +41,7 @@ export const CryptoChart: React.FC<Props> = ({ data, loading, isPositive, width 
                             fillShadowGradientFrom: "transparent",
                             fillShadowGradientTo: "transparent",
                             fillShadowGradientOpacity: 0,
-                            // Цвета
+
                             color: (opacity = 1) => `rgba(${chartColor}, ${opacity})`,
                             labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
                             style: {

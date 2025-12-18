@@ -16,7 +16,6 @@ const TransactionHistoryScreen = ({ navigation }: any) => {
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Загружаем данные каждый раз при фокусе на экран
   useFocusEffect(
     useCallback(() => {
       let isActive = true;
@@ -49,14 +48,12 @@ const TransactionHistoryScreen = ({ navigation }: any) => {
         edges={['top', 'left', 'right']}
     >
       
-      {/* 1. Заголовок */}
       <UpperText 
         title="History" 
         onPress={() => navigation.goBack()} 
       />
 
-      {/* 2. Список транзакций */}
-      <View style={{ flex: 1 }}>
+      <View style={appStyles.flexContainer}>
         {loading ? (
             <View style={styles.center}>
                 <ActivityIndicator size="large" color="#83EDA6" />
@@ -66,7 +63,7 @@ const TransactionHistoryScreen = ({ navigation }: any) => {
                 data={transactions}
                 keyExtractor={(item: any) => item.id.toString()}
                 renderItem={({ item }) => <TransactionItem item={item} />}
-                contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 20 }}
+                contentContainerStyle={styles.contentContainerStyle}
                 showsVerticalScrollIndicator={false}
                 ListEmptyComponent={
                     <View style={styles.center}>
@@ -77,7 +74,6 @@ const TransactionHistoryScreen = ({ navigation }: any) => {
         )}
       </View>
 
-      {/* 3. Нижний бар */}
       <View>
         <BottomBar
             homePress={() => navigation.navigate('Main')}
@@ -101,7 +97,8 @@ const styles = StyleSheet.create({
         color: '#777',
         fontFamily: 'Poppins-Regular',
         fontSize: 16,
-    }
+    },
+    contentContainerStyle: { paddingHorizontal: 20, paddingBottom: 20 },
 });
 
 export default TransactionHistoryScreen;

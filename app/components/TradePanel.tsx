@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { currencyAPI } from '../services/api';
+import { appStyles } from '../styles/appStyles';
 
 type TradeType = 'buy' | 'sell';
 
@@ -129,7 +130,7 @@ export const TradePanel: React.FC<TradePanelProps> = ({
                  <Text style={styles.infoText}>Price: ${currentPrice}</Text>
                  <Text style={styles.infoText}>
                      {isBuy ? 'Get:' : 'Sell:'} 
-                     <Text style={{color:'#fff', fontWeight: 'bold'}}>
+                     <Text style={styles.cryptoAmountText}>
                          {` ${cryptoAmount.toFixed(6)} ${symbol}`}
                      </Text>
                  </Text>
@@ -137,7 +138,7 @@ export const TradePanel: React.FC<TradePanelProps> = ({
 
             {/* Action Button */}
             <TouchableOpacity 
-                style={[styles.actionButton, { backgroundColor: isBuy ? '#83EDA6' : '#EB5B5B' }]}
+                style={[styles.actionButton, isBuy ? appStyles.greenBackGroudColor : appStyles.redBackGroudColor]}
                 onPress={handleTradePress}
                 disabled={isLoading}
             >
@@ -162,7 +163,7 @@ export const TradePanel: React.FC<TradePanelProps> = ({
                         <Text style={styles.modalTitle}>Confirm {isBuy ? 'Purchase' : 'Sale'}</Text>
                         
                         <Text style={styles.modalText}>
-                            Confirm in <Text style={{color: '#EB5B5B', fontWeight: 'bold'}}>{timeLeft}s</Text>
+                            Confirm in <Text style={styles.modalConfirmText}>{timeLeft}s</Text>
                         </Text>
 
                         <View style={styles.summaryContainer}>
@@ -188,7 +189,7 @@ export const TradePanel: React.FC<TradePanelProps> = ({
                                 <Text style={styles.summaryLabel}>
                                     {isBuy ? 'Receive:' : 'Sell:'}
                                 </Text>
-                                <Text style={[styles.summaryValue, {color: '#83EDA6', fontSize: 18}]}>
+                                <Text style={[styles.summaryValue, styles.modalCryptoAmountText]}>
                                     {cryptoAmount.toFixed(6)} {symbol}
                                 </Text>
                             </View>
@@ -259,8 +260,8 @@ const styles = StyleSheet.create({
         color: '#fff', 
         fontSize: 20, 
         fontFamily: 'Poppins-Bold',
-        paddingVertical: 0, // <--- IMPORTANT: Removes default Android indents
-        textAlignVertical: 'center', // <--- IMPORTANT: Centers text vertically
+        paddingVertical: 0,
+        textAlignVertical: 'center', 
         height: '100%'
     },
     currencySuffix: { 
@@ -279,6 +280,7 @@ const styles = StyleSheet.create({
         alignItems: 'center' 
     },
     actionButtonText: { fontSize: 16, fontFamily: 'Poppins-Bold', color: '#1E1E1E' },
+    cryptoAmountText: {color:'#fff', fontWeight: 'bold'},
     
     // Modal Styles (Compact)
     modalOverlay: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.7)', justifyContent: 'center', alignItems: 'center' },
@@ -297,4 +299,6 @@ const styles = StyleSheet.create({
     modalButtonConfirmSell: { backgroundColor: '#EB5B5B' },
     modalButtonTextCancel: { color: '#FFFFFF', fontFamily: 'Poppins-Bold', fontSize: 14 },
     modalButtonTextConfirm: { color: '#333333', fontFamily: 'Poppins-Bold', fontSize: 14 },
+    modalConfirmText: {color: '#EB5B5B', fontWeight: 'bold'},
+    modalCryptoAmountText: {color: '#83EDA6', fontSize: 18},
 });

@@ -159,18 +159,18 @@ const ExchangeScreen: React.FC<ExchangeScreenProps> = ({
           onPress={() => navigation.goBack()}
         />
 
-        <View style={{ flex: 1, justifyContent: 'space-between' }}>
+        <View style={styles.mainCintentContainer}>
           <View>
             {/* Price */}
             <View style={styles.priceContainer}>
               <Text style={styles.totalLabel}>Current Price</Text>
               <Text style={styles.bigPrice}>${currentPrice}</Text>
 
-              <View style={{ flexDirection: 'row' }}>
+              <View style={styles.rowDirectionContainer}>
                 <Text
                   style={[
                     styles.changeText,
-                    { color: isPositive ? '#83EDA6' : '#EB5B5B' },
+                    isPositive ? appStyles.green : appStyles.red,
                   ]}
                 >
                   {priceChangeValue}$ ({isPositive ? '+' : ''}
@@ -232,6 +232,13 @@ const styles = StyleSheet.create({
   priceContainer: {
     alignItems: 'center',
     marginTop: 5,
+  },
+  mainCintentContainer: { 
+    flex: 1,
+    justifyContent: 'space-between'
+  },
+  rowDirectionContainer: {
+    flexDirection: 'row' 
   },
   totalLabel: {
     color: '#AAAAAA',

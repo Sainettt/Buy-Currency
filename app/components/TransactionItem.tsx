@@ -3,8 +3,8 @@ import { View, Text, StyleSheet } from 'react-native';
 
 type Transaction = {
   id: number;
-  type: string;     // 'DEPOSIT', 'BUY', 'SELL'
-  currency: string; // 'USD', 'BTC'
+  type: string;
+  currency: string;
   amount: number;
   price: number;
   totalUsd: number;
@@ -16,12 +16,10 @@ type Props = {
 };
 
 const TransactionItem: React.FC<Props> = ({ item }) => {
-  // Форматируем дату
   const date = new Date(item.createdAt).toLocaleDateString('en-GB', {
     day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'
   });
 
-  // Переменные для отображения
   let titleText = '';
   let amountText = '';
   let valueColor = '#FFFFFF';
@@ -29,19 +27,28 @@ const TransactionItem: React.FC<Props> = ({ item }) => {
   switch (item.type) {
     case 'DEPOSIT':
       titleText = 'Top Up';
-      valueColor = '#83EDA6'; // Зеленый
+      valueColor = '#83EDA6';
       amountText = `+${item.amount.toFixed(2)}$`;
       break;
+
+    case 'WITHDRAWAL':
+      titleText = 'Withdraw';
+      valueColor = '#83EDA6';
+      amountText = `-${item.amount.toFixed(2)}$`; 
+      break;
+
     case 'BUY':
       titleText = `Buy ${item.currency}`;
-      valueColor = '#FFFFFF'; // Белый (нейтральный расход баланса)
+      valueColor = '#FFFFFF'; 
       amountText = `-${item.totalUsd.toFixed(2)}$`;
       break;
+
     case 'SELL':
       titleText = `Sell ${item.currency}`;
-      valueColor = '#83EDA6'; // Зеленый (получили доллары)
+      valueColor = '#FFFFFF';
       amountText = `+${item.totalUsd.toFixed(2)}$`;
       break;
+
     default:
       titleText = 'Transaction';
       amountText = `${item.totalUsd.toFixed(2)}$`;
@@ -49,6 +56,7 @@ const TransactionItem: React.FC<Props> = ({ item }) => {
 
   return (
     <View style={styles.container}>
+
       <View style={styles.left}>
         <Text style={styles.typeText}>{titleText}</Text>
         <Text style={styles.dateText}>{date}</Text>
@@ -59,8 +67,7 @@ const TransactionItem: React.FC<Props> = ({ item }) => {
           {amountText}
         </Text>
         
-        {/* Детали сделки (цена покупки/продажи), если это не пополнение */}
-        {item.type !== 'DEPOSIT' && (
+        {(item.type === 'BUY' || item.type === 'SELL') && (
             <Text style={styles.subText}>
                 {item.amount} {item.currency} @ {item.price.toFixed(2)}$
             </Text>

@@ -7,6 +7,7 @@ import MainScreen from '../screens/appScreens/MainScreen';
 import PaymentMethodScreen from '../screens/appScreens/PaymentMethodScreen';
 import WalletScreen from '../screens/appScreens/WalletScreen';
 import TransactionHistoryScreen from '../screens/appScreens/TransactionHistoryScreen'
+import WithdrawScreen from '../screens/appScreens/WithdrawScreen';
 import { AppStackParamList } from '../src/navigation/appTypes';
 
 const Stack = createNativeStackNavigator<AppStackParamList>();
@@ -21,6 +22,7 @@ const AppNavigator: React.FC = () => {
       <Stack.Screen name="PaymentMethod" component={PaymentMethodScreen} />
       <Stack.Screen name="Wallet" component={WalletScreen} />
       <Stack.Screen name="TransactionHistory" component={TransactionHistoryScreen} />
+      <Stack.Screen name="Withdraw" component={WithdrawScreen} />
     </Stack.Navigator>
   );
 };

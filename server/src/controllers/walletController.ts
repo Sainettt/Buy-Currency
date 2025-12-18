@@ -176,6 +176,51 @@ class WalletController {
             return res.status(500).json({ message: 'Error fetching transactions' });
         }
     }
+    async withdraw(req: Request, res: Response): Promise<any> {
+        try {
+            const { userId, amount } = req.body;
+
+            const wallet = await prisma.wallet.findUnique({ where: { userId } });
+            if (!wallet) return res.status(404).json({ message: 'Wallet not found' });
+
+            if (wallet.balanceUsd < amount) {
+                return res.status(400).json({ message: 'Insufficient USD balance' });
+            }
+
+            const card = await prisma.bankCard.findUnique({ where: { userId } });
+            if (!card) return res.status(404).json({ message: 'Bank card not found' });
+
+            await prisma.$transaction(async (tx) => {
+
+                await tx.wallet.update({
+                    where: { id: wallet.id },
+                    data: { balanceUsd: { decrement: amount } }
+                });
+
+                await tx.bankCard.update({
+                    where: { userId },
+                    data: { balance: { increment: amount } }
+                });
+
+                await tx.transaction.create({
+                    data: {
+                        walletId: wallet.id,
+                        type: 'WITHDRAWAL',
+                        currency: 'USD',
+                        amount: amount,
+                        price: 1.0,
+                        totalUsd: amount
+                    }
+                });
+            });
+
+            return res.json({ message: 'Withdrawal successful' });
+
+        } catch (e) {
+            console.error('Withdraw error:', e);
+            return res.status(500).json({ message: 'Withdrawal failed' });
+        }
+    }
 }
 
 export default new WalletController();

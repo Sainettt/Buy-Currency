@@ -7,6 +7,7 @@ type TotalBalanceProps = {
     changeValue?: string;
     changePercent?: string;
     onTopUpPress: () => void;
+    onWithdrawPress: () => void;
     loading: boolean;
 }
 
@@ -15,6 +16,7 @@ const TotalBalance: React.FC<TotalBalanceProps> = ({
     changeValue = "0.00", 
     changePercent = "0.00", 
     onTopUpPress, 
+    onWithdrawPress,
     loading 
 }) => {
     
@@ -29,15 +31,13 @@ const TotalBalance: React.FC<TotalBalanceProps> = ({
             </View>
             
             <View style={styles.container}>
+                {/* Balance */}
                 <View style={styles.textBlock}>
                     {loading ? (
-                         <ActivityIndicator size="large" color="#83EDA6" style={{marginLeft: 20}} />
+                         <ActivityIndicator size="large" color="#83EDA6" style={styles.marginBalance} />
                     ) : (
                         <>
-                            {/* Основной баланс */}
                             <Text style={styles.balanceText}>{balance}$</Text>
-                            
-                            {/* Новая строка PnL */}
                             <View style={styles.pnlContainer}>
                                 <Text style={styles.pnlLabel}>PnL Today: </Text>
                                 <Text style={[styles.pnlValue, { color }]}>
@@ -48,9 +48,16 @@ const TotalBalance: React.FC<TotalBalanceProps> = ({
                     )}
                 </View>
 
-                <TouchableOpacity style={appStyles.topUpButton} onPress={onTopUpPress}>
-                    <Text style={appStyles.topUpText}>Top Up</Text>
-                </TouchableOpacity>
+                {/* Buttons TopUp and WithDraw */}
+                <View style={styles.buttonsContainer}>
+                    <TouchableOpacity style={styles.actionButton} onPress={onTopUpPress}>
+                        <Text style={styles.buttonText}>Top Up</Text>
+                    </TouchableOpacity>
+                    
+                    <TouchableOpacity style={[styles.actionButton, styles.withdrawButton]} onPress={onWithdrawPress}>
+                        <Text style={styles.buttonText}>Withdraw</Text>
+                    </TouchableOpacity>
+                </View>
             </View>
         </View>
     );
@@ -66,29 +73,49 @@ const styles = StyleSheet.create({
     textBlock: {
         flexDirection: 'column',
         justifyContent: 'center',
+        flex: 1, 
     },
     balanceText: {
-        fontSize: 40,
+        fontSize: 32,
         fontFamily: 'Poppins-Bold',
         color: '#FFFFFF',
         includeFontPadding: false,
-        lineHeight: 48,
     },
     pnlContainer: {
         flexDirection: 'row',
         alignItems: 'center',
         marginTop: -5,
-        marginLeft: 5,
     },
     pnlLabel: {
-        fontSize: 14,
+        fontSize: 12,
         fontFamily: 'Poppins-Medium',
         color: '#AAAAAA',
     },
     pnlValue: {
-        fontSize: 14,
+        fontSize: 12,
         fontFamily: 'Poppins-Medium',
-    }
+    },
+    buttonsContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 10,
+    },
+    actionButton: {
+        backgroundColor: '#83EDA6',
+        borderRadius: 8,
+        paddingVertical: 10,
+        paddingHorizontal: 12,
+        alignItems: 'center',
+    },
+    withdrawButton: {
+        backgroundColor: '#4A4A4A', 
+    },
+    buttonText: {
+        fontSize: 14,
+        fontFamily: 'Poppins-Bold',
+        color: '#FFFFFF', 
+    },
+    marginBalance: {marginLeft: 10}
 });
 
 export default TotalBalance;

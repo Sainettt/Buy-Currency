@@ -90,6 +90,7 @@ const MainScreen: React.FC<MainProps> = ({ navigation }: MainProps) => {
         <TotalBalance
           balance={totalBalance}
           onTopUpPress={() => navigation.navigate('BalanceTopUp')}
+          onWithdrawPress={() => navigation.navigate('Withdraw')}
           changeValue={portfolioStats.val}
           changePercent={portfolioStats.pct}
           loading={loading}
