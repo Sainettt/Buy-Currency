@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import prisma from '../prisma';
+import { AuthRequest } from '../middleware/authMiddleware'
 import { isValidEmail, isValidPassword } from '../utils/validation'
 
 const generateFakeCardNumber = () => {
@@ -162,6 +163,24 @@ class AuthController {
         } catch (e) {
             console.error(e);
             return res.status(500).json({ message: 'Login error' });
+        }
+    }
+    async check(req: AuthRequest, res: Response): Promise<any> {
+        try {
+            const { id, email, userName, createdAt } = req.user;
+            
+            const token = generateJwt(id, email, userName, createdAt);
+
+            return res.json({
+                token,
+                user: {
+                    id,
+                    email,
+                    username: userName
+                }
+            });
+        } catch (e) {
+            return res.status(500).json({ message: 'Server error' });
         }
     }
 }

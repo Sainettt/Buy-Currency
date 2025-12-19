@@ -1,12 +1,14 @@
-import React, { createContext, useState, ReactNode } from 'react';
+import React, { createContext, useState, ReactNode, useEffect } from 'react';
 import { authAPI } from '../services/api';
 import { Alert } from 'react-native';
+import * as Keychain from 'react-native-keychain';
 
 type AuthContextType = {
   isLoggedIn: boolean;
   token: string | null;
   userId: number | null;
   isLoading: boolean;
+  isSplashLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (
     userName: string,
@@ -21,6 +23,7 @@ export const AuthContext = createContext<AuthContextType>({
   token: null,
   userId: null,
   isLoading: false,
+  isSplashLoading: true,
   login: async () => {},
   register: async () => {},
   logout: () => {},
@@ -31,15 +34,52 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [token, setToken] = useState<string | null>(null);
   const [userId, setUserId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSplashLoading, setIsSplashLoading] = useState(true);
+
+  useEffect(() => {
+    const loadSession = async () => {
+      try {
+        const credentials = await Keychain.getGenericPassword();
+        
+        if (credentials) {
+          setUserId(Number(credentials.username));
+          setToken(credentials.password);
+          setIsLoggedIn(true);
+        }
+      } catch (error) {
+        console.log('Error loading session', error);
+        await logout();
+      } finally {
+        setIsSplashLoading(false);
+      }
+    };
+
+    loadSession();
+  }, []);
+
+  const saveSession = async (newToken: string, newUserId: number) => {
+    try {
+
+      await Keychain.setGenericPassword(String(newUserId), newToken);
+      
+      setToken(newToken);
+      setUserId(newUserId);
+      setIsLoggedIn(true);
+    } catch (e) {
+      console.log('Error saving to keychain', e);
+    }
+  };
 
   const login = async (email: string, password: string) => {
     try {
       setIsLoading(true);
       const data = await authAPI.login(email, password);
 
-      setToken(data.token);
-      setUserId(data.user.id);
-      setIsLoggedIn(true);
+      if (data.token && data.user?.id) {
+        await saveSession(data.token, data.user.id);
+      } else {
+          Alert.alert('Login Error', 'Invalid server response');
+      }
     } catch (error: any) {
       console.log(error);
       Alert.alert(
@@ -51,18 +91,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const register = async (
-    userName: string,
-    email: string,
-    password: string,
-  ) => {
+  const register = async (userName: string, email: string, password: string) => {
     try {
       setIsLoading(true);
       const data = await authAPI.registration(userName, email, password);
 
-      setToken(data.token);
-      setUserId(data.user.id);
-      setIsLoggedIn(true);
+      if (data.token && data.user?.id) {
+        await saveSession(data.token, data.user.id);
+      }
     } catch (error: any) {
       console.log(error);
       Alert.alert(
@@ -74,15 +110,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const logout = () => {
-    setToken(null);
-    setUserId(null);
-    setIsLoggedIn(false);
+  const logout = async () => {
+    try {
+        await Keychain.resetGenericPassword();
+        setToken(null);
+        setUserId(null);
+        setIsLoggedIn(false);
+    } catch (e) {
+        console.log('Logout error', e);
+    }
   };
 
   return (
     <AuthContext.Provider
-      value={{ isLoggedIn, token, userId, isLoading, login, register, logout }}
+      value={{ isLoggedIn, token, userId, isLoading, isSplashLoading, login, register, logout }}
     >
       {children}
     </AuthContext.Provider>

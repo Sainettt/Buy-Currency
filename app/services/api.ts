@@ -1,4 +1,5 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
+import * as Keychain from 'react-native-keychain';
 
 const API_URL = 'http://10.0.2.2:4000/api'; 
 
@@ -46,6 +47,19 @@ $api.interceptors.response.use(
   }
 );
 
+$api.interceptors.request.use(async (config) => {
+  try {
+    const credentials = await Keychain.getGenericPassword();
+    
+    if (credentials) {
+      config.headers.Authorization = `Bearer ${credentials.password}`;
+    }
+  } catch (error) {
+    console.log('Error loading token', error);
+  }
+  return config;
+});
+
 
 // --- API METHODS ---
 export const authAPI = {
@@ -57,7 +71,11 @@ export const authAPI = {
     async login(email: string, password: string) {
         const response = await $api.post('auth/login', { email, password });
         return response.data;
-    }
+    },
+    async check() {
+    const response = await $api.get('/user/auth'); 
+    return response.data;
+  }
 };
 
 export const currencyAPI = {

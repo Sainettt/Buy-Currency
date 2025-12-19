@@ -233,4 +233,7 @@ export const appStyles = StyleSheet.create({
   red: {
     color: '#EB5B5B'
   },
+  spinerForRootNavigator: {
+    flex: 1, justifyContent: 'center', alignItems: 'center'
+  }
 });
