@@ -116,14 +116,11 @@ class CurrencyController {
     }
     async getRate(req: Request, res: Response): Promise<any> {
         try {
-            const { symbol } = req.query; // Ожидаем, например, "BTCUSDT"
+            const { symbol } = req.query;
             
-            // Запрос к Binance: /api/v3/ticker/price?symbol=BTCUSDT
             const response = await binanceApi.get('/ticker/price', {
                 params: { symbol }
             });
-
-            // Binance возвращает: { symbol: "BTCUSDT", price: "65000.00" }
             return res.json(response.data);
         } catch (e) {
             console.error('Error fetching rate:', e);

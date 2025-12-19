@@ -5,6 +5,7 @@ import authRouter from './routes/authRouter';
 import currencyRouter from './routes/currencyRouter';
 import walletRouter from './routes/walletRouter';
 import tradeRouter from './routes/tradeRouter';
+import { startPriceUpdater } from '../src/controllers/services/priceCache'
 
 dotenv.config();
 
@@ -23,6 +24,7 @@ app.use('/api/auth', authRouter);
 app.use('/api/currency', currencyRouter);
 app.use('/api/wallet', walletRouter);
 app.use('/api/trade', tradeRouter);
+startPriceUpdater();
 
 const start = async () => {
     try {
