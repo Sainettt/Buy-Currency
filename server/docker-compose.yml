@@ -1,16 +1,38 @@
 version: '3.8'
+
 services:
+  # --- БАЗА ДАННЫХ ---
   postgres:
     image: postgres:15
-    container_name: buy_currency_db
+    container_name: sim_trader_db
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password123
-      POSTGRES_DB: buy_currency_db
+      POSTGRES_DB: sim_trader_db
     ports:
+      # Пробрасываем порт наружу, чтобы ты мог подключиться к базе локально (через localhost)
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    restart: always
+
+  # --- ТВОЙ БЭКЕНД ---
+  backend:
+    build: .
+    container_name: simtrader_backend
+    ports:
+      - "4000:4000"
+    env_file:
+      - .env  # Читаем все переменные из файла (PORT, JWT_SECRET и т.д.)
+    environment:
+      # ПЕРЕОПРЕДЕЛЕНИЕ:
+      # Специально для контейнера подменяем localhost на имя сервиса "postgres"
+      - DATABASE_URL=postgresql://user:password123@postgres:5432/sim_trader_db?schema=public
+    depends_on:
+      - postgres
+    volumes:
+      - ./:/app           # Проброс кода (чтобы работало обновление при сохранении)
+      - /app/node_modules # Изоляция библиотек (используем те, что внутри Linux)
 
 volumes:
   postgres_data:

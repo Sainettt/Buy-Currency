@@ -89,7 +89,7 @@ const MainScreen: React.FC<MainProps> = ({ navigation }: MainProps) => {
         </View>
         <TotalBalance
           balance={totalBalance}
-          onTopUpPress={() => navigation.navigate('BalanceTopUp')}
+          onTopUpPress={() => navigation.navigate('PaymentMethod')}
           onWithdrawPress={() => navigation.navigate('Withdraw')}
           changeValue={portfolioStats.val}
           changePercent={portfolioStats.pct}
